@@ -1,0 +1,205 @@
+<html>
+    <head>
+        <title> Démarrer avec KaiOS </title>
+        <link rel="stylesheet" href="/css/index.css"/>
+    </head>
+    <body>
+        <nav>
+            &rarr;
+            <a href="/">Accueil</a>
+            &rarr;
+            Démarrer avec KaiOS
+        </nav>
+        <div>
+            <p>
+                <img src="/images/nokia.jpg" height="300px" />
+            </p>
+            <h1>Démarrer avec KaiOS</h1>
+            <p>
+                <small>Publié le 10/04/2022</small>
+            </p>
+            <p>
+                Les paragraphes suivants listent les actions à suivre pour démarrer avec KaiOS de façon sécurisée.
+                Tout a été testé avec le <em>Nokia 800 Tough</em>, et avec <em>Linux Mint</em> (dérivé d'Ubuntu).
+            </p>
+            <h2>Activation de root</h2>
+            <p>
+                L'activation du compte root est necéssaire pour avoir entièrement la main sur KaiOS.
+                Les actions qui suivent sont tirées de <a target="_blank" href="https://www.reddit.com/r/KaiOS/comments/tnnve7/rooting_the_nokia_8000_tough/">Reddit</a> 
+                et de <a target="_blank" href="https://ivan-hc.github.io/bananahackers/Nokia%208000%204G%20%20Nokia%206300%204G%202020.html">BananaHackers</a>.
+            </p>
+            <p>
+                <u>En pré-requis</u>, installer les éléments suivant:
+                <ul>
+                    <li><code>git</code> : accès au projets sur Github et Gitlab</li>
+                    <li><code>docker</code> : lancement du 8k-bootpatcher (voir plus loin)</li>
+                    <li><code>python/pip3</code> : lancement de edl</li>
+                    <li><code>adb</code> : accès aux fonctionnalités de debug USB du téléphone</li>
+                </ul>
+                Installer également les librairies python <code>capstone</code> et <code>pyusb</code> pour permettre le lancement d'edl:
+                <code>
+                    pip install capstone pyusb
+                </code>
+            </p>
+            <p>
+                <u>Cloner les 2 repository</u> suivants:
+                <ul>
+                    <li>
+                        <code>git clone https://github.com/andybalholm/edl</code> : 
+                        outil de communication avec le téléphone en mode EDL (Emergency Download Mode)
+                    </li>
+                    <li>
+                        <code>git clone https://gitlab.com/suborg/8k-boot-patcher.git</code> : 
+                        outil de patch de la partition de boot pour obtenir les droits root
+                    </li>
+                </ul>
+            </p>
+            <p>
+                <u>Paramétrer la connexion USB</u> pour EDL. Copier les fichiers dans /etc/rules.d/:
+                <pre>
+cd edl
+sudo cp 51-edl.rules /etc/udev/rules.d/
+sudo cp 50-android.rules /etc/udev/rules.d/
+                </pre>
+                Puis ajouter les lignes suivantes à la fin du fichier /etc/modprobe.d/blacklist.conf:
+                <pre>
+# Blacklist Qualcomm Serial Driver to not interfere with EDL
+blacklist qcserial
+                </pre>
+                Puis redémarrer la machine, ou bien appliquer les nouvelles règles udev : <code>service udev restart</code>
+            </p>
+            <p>
+                <u>Vérifier que la connexion</u> adb fonctionne:
+                <pre>
+adb devices
+List of devices attached
+xxxxxxxx	device
+                </pre>
+                Si aucun téléphone n'est listé par la commande précédente, activer le mode debug en composant 
+                le numéro <code>*#*#33284#*#*</code> sur le téléphone (33284 équivaut à debug sur le clavier numérique).
+            </p>
+            <p>
+                Le mode débug peut également être activé via le navigateur du téléphone, en ouvrant la page 
+                <a target="_blank" href="https://w2d.bananahackers.net">https://w2d.bananahackers.net</a>, 
+                puis en cliquant sur <em>Launch Developer menu</em>. Le débogueur est accessible en choisissant 
+                <em>Débogueur -> ADB et outil de développement</em>.
+            </p>
+            <p>
+                <u>Télécharger le Firehose</u> depuis <a href="https://edl.bananahackers.net/loaders/800t.mbn">BananaHackers</a> 
+                ou <a href="/data/nokia-800-tough/800t.mbn">directement ici</a>. Le Firehose permet de communiquer avec le téléphone en mode EDL.
+            </p>
+            <p>
+                Tout est maintenant prêt pour commencer le passage du téléphone en root.
+                Toutes les étapes suivantes doivent être réalisées sans erreur, au risque de bloquer définitivement le télephone 
+                avec une image de boot corrompue.
+            </p>
+            <p>
+                <u>Démarrer le tépéhone</u> en mode EDL:
+                <pre>
+adb reboot edl
+                </pre>
+                En mode EDL, le téléphone redémarre et reste sur un écran noir.
+                Pour sortir du mode EDL, appuyer en même temps sur les boutons Démarrage + Bas. Le téléphone redémarre 
+                alors en mode normal. Pour vérifier que la connexion est correcte en EDL, lancer la commande suivante dans le projet 
+                edl:
+                <pre>
+python3 edl.py -loader 800t.mbn -printgpt
+                </pre>
+                Cette commande affiche simplement la liste des partitions du téléphone. Si le message affiché est :
+                <pre>
+Using loader 800t.mbn ...
+Waiting for the device
+....
+                </pre>
+                Cela signifie que la connexion ne peut pas être établie. Dans ce cas, le mode EDL est peut être inactif, redémarrer 
+                le téléphone en mode normal (Démarrage + Bas), puis repasser en EDL et lancer tout de suite la commande edl:
+                <pre>
+adb reboot edl
+python3 edl.py -loader 800t.mbn -printgpt
+                </pre>
+            </p>
+            <p>
+                <u>Dumper la partition</u> de boot en mode EDL comme ceci:
+                <pre>
+adb reboot edl
+python3 edl.py -loader 800t.mbn -r boot boot.img
+                </pre>
+                Le fichier <code>boot.img</code> est créé sur votre machine, il est à mettre de côté pour garder une version 
+                d'origine de l'image de boot.
+            </p>
+            <p>
+                <u>Patcher l'image</u> de boot pour lui donner les droits root. Pour cela, utiliser le projet <code>8k-boot-patcher</code>
+                avec docker, où <code>/home/utilisateur</code> correspond au réperoire contenant le fichier <code>boot.img</code>:
+                <pre>
+cd 8k-boot-patcher
+sudo docker build -t 8kbootpatcher .
+sudo docker run --rm -it -v /home/utilisateur/:/image 8kbootpatcher
+                </pre>
+                Après cette commande, le fichier <code>boot.img</code> contient l'image patchée avec les droits root, et le fichier 
+                <code>boot-ori.img</code> contient l'image d'origine.
+                <br />
+                Les images <code>boot.img</code> et <code>boot-ori.img</code> pour le <em>Nokia 800 Tough</em> peuvent être <a href="/data/nokia-800-tough/boot.7z">téléchargées ici</a>.
+            </p>
+            <p>
+                <u>La dernière étape</u> consiste à écrire l'image de boot patchée sur le téléphone. Cette étape est critique, 
+                bien s'assurer que le tépéhone est chargé, le cable branché de façon sécurisé. Redémarrer en mode EDL, puis lancer 
+                la commande de mise à jour de l'image de boot:
+                <pre>
+adb reboot edl
+python3 edl.py -loader 800t.mbn -w boot boot.img
+                </pre>
+                Après un redémarrage du téléphone (touches Démarrage + Bas), lancer la commande d'accès au téléphone en mode shell:
+                <pre>adb shell</pre>
+                L'utilisateur de connexion est bien root:
+                <pre>root@Nokia 800 Tough:/ #</pre>
+            </p>
+            <h2>Suppression des applications initiales</h2>
+            <p>
+                L'installation d'usine de KaiOS fournit des applications qu'on ne souhaite pas forcément garder sur son téléphone. 
+                Malheureusement, toutes les applications ne sont pas supprimables par défaut. La manipulation permet de désactiver le blocage 
+                de suppression sur les application, afin de supprimer celles qu'on ne veut pas garder. Ces informations sont tirées de 
+                <a target="_blank" href="https://martinkaptein.com/blog/kai-os-remove-default-pre-installed-bloatware-apps/">cet article</a> de Martin Kaptein.
+            </p>
+            <p>
+                <u>Récupérer le fichier</u> webapp.json avec la commande suivante:
+                <pre>adb pull data/local/webapps/webapps.json</pre>
+                Sauvegarder le fichier <code>webapps.json</code> pour revenir en arrière si besoin. Puis éditer ce fichier 
+                et remplacer tous les <code>"removable": false</code> par <code>"removable": true</code>.
+            </p>
+            <p>
+                <u>Pour renvoyer le fichier</u> sur le téléphone, la commande est la suivante:
+                <pre>adb push webapps.json data/local/webapps/webapps.json</pre>
+                Il ne reste plus qu'à redémarrer le téléphone pour prendre en compte le changement et avoir accès à la suppression 
+                de toutes les applications.
+            </p>
+            <h2>Blocage des publicités</h2>
+            <p>
+                Les publicités affichées par KaiOS par défaut sont gênantes pour une utilisation quotidienne.
+                Il est possible de désactiver les publicités en bloquant l'adresse <code>ssp.kaiads.com</code> dans le fichier <code>hosts</code>, 
+                comme indiqué <a target="_blank" href="https://sites.google.com/view/bananahackers/customizations/adblock">sur BananaHackers</a><div class=""></div>
+            </p>
+            <p>
+                <u>Copier le fichier</u> <code>hosts</code> d'origine sur l'ordinateur:
+                <pre>adb pull /system/etc/hosts</pre>
+                Sauvegarder ce fichier si necéssaire.
+            </p>
+            <p>
+                <u>Récupérer</u> le fichier <a target="_blank" href="https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts">hosts</a> contenant le blocage 
+                des publicités, et y ajouter une ligne pour bloquer les publicités KaiOS:
+                <pre>0.0.0.0 ssp.kaiads.com</pre>
+            </p>
+            <p>
+                <u>Copier/coller</u> le fichier <code>hosts</code> sur la carte SD, puis lancer les commandes suivantes pour installer 
+                ce fichier sur le téléphone:
+                <pre>
+adb shell
+mount -o remount,rw /system
+cp -f /sdcard/hosts /system/etc
+exit
+adb reboot
+                </pre>
+                Après le redémarrage du téléphone, les publicités sont bloquées !
+            </p>
+        </div>
+    </body>
+</html>
