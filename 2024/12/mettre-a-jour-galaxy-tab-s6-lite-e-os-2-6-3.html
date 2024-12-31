@@ -1,0 +1,61 @@
+<html>
+    <head>
+        <title> Mettre à jour Galaxy Tab S6 Lite /e/ OS 2.6.3 </title>
+        <link rel="stylesheet" href="/css/index.css"/>
+    </head>
+    <body>
+        <nav>
+            &rarr;
+            <a href="/">Accueil</a>
+            &rarr;
+            Mettre à jour une tablette Galaxy Tab S6 Lite pour /e/ OS 2.6.3
+        </nav>
+        <div>
+            <h1>Mettre à jour une tablette Galaxy Tab S6 Lite pour /e/ OS 2.6.3</h1>
+            <p>
+                <small>Publié le 31/12/2024</small>
+            </p>
+            <p>
+                Cet article présente la mise à jour d'une tablette <em>Samsung Galaxy Tab S6 Lite</em> pour /e/ OS en version <strong>2.6.3</strong> (Android 14).
+                La tablette était déjà en version 2.5 de /e/ OS.
+            </p>
+            <p>
+                Ces actions ont été réalisées à partir de <a href="https://doc.e.foundation/devices/gta4xl/install">la documentation officielle /e/ OS</a>. Les images sont téléchargées <a href="https://images.ecloud.global/community/gta4xl/">sur la page de téléchargement du modèle gta4xl</a>.
+            </p>
+            <h2>Mise à jour de /e/ OS Recovery</h2>
+            <p>
+                Le Recovery de /e/ OS était en version 2.3, pour s'aligner avec la version de la ROM installée il est préférable d'installer le Recovery 2.6.3.
+            </p>
+            <p>
+                Pour passer en mode Recovery, éteinde la tablette, puis en pressant simultanément les boutons de Volume haut et bas, et connecter la tablette au PC. Puis accepter de passer en Recovery avec le bouton Volume haut.
+            </p>
+            <p>
+                Sur les équipements Samsung Galaxy, la gestion du Recovery est faite avec <a href="https://github.com/Benjamin-Dobell/Heimdall">Heimdall</a>. Après compilation du programme, lancer la commande de mise à jour du Recovery:
+            </p>
+            <p>
+                <pre>
+./heimdall flash --RECOVERY /CHEMIN_VERS_RECOVERY/recovery-e-2.6.3-u-20241218455570-community-gta4xl.img --no-reboot
+                </pre>
+            </p>
+            <h2>Installation de la nouvelle image /e/ OS</h2>
+            <p>
+                Directement après l'installation de la nouvelle image de Recovery, passer en mode Recovery. Avec la tablette éteinte, appuyer simultanément sur Volume haut et Power.
+            </p>
+            <p>
+                Ré-initialiser les réglages d'usine avec (action réalisée car il y a eu des problèmes d'installation, ça n'est peut être pas nécessaire):
+                <pre>
+Factory reset &rarr; Format data / Factory reset option
+                </pre>
+            </p>
+            <p>
+                Enfin, installer la nouvelle image de /e/ OS. Sélectionner <code>Apply update</code>, puis <code>Apply update from adb</code>. Sur l'ordinateur, lancer la mise à jour avec la commande <code>adb</code>:
+                <pre>
+/CHEMIN_VERS_HOME/Android/Sdk/platform-tools/adb sideload /CHEMIN_VERS_IMAGE/e-2.6.3-u-20241218455570-community-gta4xl.zip
+                </pre>
+            </p>
+            <p>
+                Malgré une alerte <em>Verify failed</em>, en continuant l'image s'installe bien (le md5sum était pourtant correct sur le PC).
+            </p>
+        </div>
+    </body>
+</html>
