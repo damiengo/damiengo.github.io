@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title> Installer crDroid sur un Samsung Galaxy A5 </title>
+        <link rel="stylesheet" href="/css/index.css"/>
+    </head>
+    <body>
+        <nav>
+            &rarr;
+            <a href="/">Accueil</a>
+            &rarr;
+            Installer crDroid sur un Samsung Galaxy A5
+        </nav>
+        <div>
+            <h1>Installer crDroid sur un Samsung Galaxy A5</h1>
+            <p>
+                <small>Publié le 01/01/2025</small>
+            </p>
+            <p>
+                Sur un téléphone Samsung Galaxy A5 (a5xelte) avec FRP et OEM débloqué, voici la procédure d'installation d'un nouveau Recovery TWRP et d'une ROM crDroid en version Android 11.
+            </p>
+            <h2>Installation de TWRP 3.5.0</h2>
+            <p>
+                Le Recovery par défaut doit être remplacé par TWRP pour ensuite pouvoir installer une ROM personnalisée. La version de TWRP à utiliser est <a href="https://eu.dl.twrp.me/a5xelte/">la 3.5.0</a>.
+            </p>
+            <p>
+                Pour permettre la mise à jour du recovery, éteindre le téléphone puis appuyer simultanément sur les touches <code>Volume bas + Home + Power</code>.
+                Ensuite, sur un PC Windows avec <a href="https://www.odinflash.com/">Odin en version 3.14</a>, installer l'image TWRP <code>twrp-3.5.0_9-0-a5xelte.img.tar</code>. Choisir le mode <code>AP</code>, et désactiver le reboot automatique.
+            </p>
+            <p>
+                Lorsque la mise à jour est terminée dans Odin, redémarrer le téléphone en appuyant simultanément sur les touches <code>Volume bas + Home + Power</code>. Lorsque l'écran noir d'Android apparait, basculer sur un appui des touches <code>Volume haut + Home + Power</code> pour démarrer en mode Recovery.
+            </p>
+            <h2>Installation de crDroid</h2>
+            <p>
+                L'installation de crDroid est inspirée <a href="https://xdaforums.com/t/crdroid-v7-16-unofficial-for-a510-a5-2016-a5xelte-android-11.4418003/">du forum XDA</a>. Après avoir <a href="https://sourceforge.net/projects/projectakystofficial/files/a5crdroid/crDroidAndroid-11.0-20220317-a5xelte-v7.16.zip/download">téléchargé l'image</a>, dans TWRP faire un <code>factory reset</code> des données afin de réinitialiser le téléphone.
+            </p>
+            <p>
+                Puis dans TWRP, dans <code>Advanced</code>, choisir l'option <code>Adb sideload</code>. Sur le PC, lancer le chargement de la nouvelle ROM:
+                <pre>
+/CHEMIN_VERS_HOME/Android/Sdk/platform-tools/adb sideload /CHEMIN_VERS_IMAGE/crDroidAndroid-11.0-20220317-a5xelte-v7.16.zip
+                </pre>
+            </p>
+        </div>
+    </body>
+</html>
